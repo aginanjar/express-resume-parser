@@ -1,0 +1,38 @@
+{
+  "name": "express-resume-parser",
+  "version": "1.0.0",
+  "description": "REST API with Express for parsing resume",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "resume",
+    "cv",
+    "parser",
+    "resume parser",
+    "cv parser",
+    "express",
+    "nodejs"
+  ],
+  "author": "Ahmad Ginanjar M <ahmad.ginanjar.m@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^5.1.0",
+    "supertest": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aginanjar/express-resume-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aginanjar/express-resume-parser/issues"
+  },
+  "homepage": "https://github.com/aginanjar/express-resume-parser",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "resume-parser": "^1.1.0",
+    "ahmad-resume-parser": "git@github.com:aginanjar/resume-parser.git#fbac2ee"
+  }
+}
