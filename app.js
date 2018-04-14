@@ -1,19 +1,20 @@
+require('dotenv').config()
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const fs = require('fs')
 const ResumeParser = require('resume-parser')
 const app = express()
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 // Route to /parse/resume
 app.post('/parse/resume', (req, res) => {
-    
-    const inputDir = process.cwd() + '/files/sources/'
+    const inputDir = process.env.SOURCE_DIR || process.cwd() + '/files/sources/'
     const fileName = req.body.filename
-    const outputDir = process.cwd()+'/files/compiled/'
+    const outputDir = process.env.OUTPUT_DIR || process.cwd()+'/files/compiled/'
 
     let customMessage = {}
     let processFailed = false
@@ -44,15 +45,25 @@ app.post('/parse/resume', (req, res) => {
     
     // Resume parsing process
     ResumeParser
-        .parseResumeFile(inputDir + fileName, inputDir) //input file, output dir
+        .parseResumeFile(inputDir + fileName, outputDir) //input file, output dir
         .then(file => {
             result = JSON.parse(fs.readFileSync(outputDir + fileName + '.json', 'utf8'))
             
             // Remove compiled file
-            fs.unlink(outputDir + fileName + '.json' , (err) => {
-                if (err) throw err;
-                console.log(outputDir + fileName + '.json'+' was deleted')
-            });
+            const outputFile = outputDir + fileName + '.json';
+            if (fs.existsSync(outputFile)) {
+                fs.unlink(outputFile, (err) => {
+                    if (err) throw err;
+                    console.log(outputFile + ' was deleted')
+                });
+            } else {
+                return res
+                    .status(200)
+                    .json({
+                        success: false,
+                        message: "Output is failed to generate."
+                    })
+            }
 
             // Return OK response
             return res
