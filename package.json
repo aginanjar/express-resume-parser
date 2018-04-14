@@ -4,7 +4,8 @@
   "description": "REST API with Express for parsing resume",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app",
+    "test": "node_modules/.bin/mocha -u exports tests/api/*"
   },
   "keywords": [
     "resume",
@@ -30,9 +31,10 @@
   },
   "homepage": "https://github.com/aginanjar/express-resume-parser",
   "dependencies": {
+    "ahmad-resume-parser": "git@github.com:aginanjar/resume-parser.git#fbac2ee",
     "body-parser": "^1.18.2",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
-    "resume-parser": "^1.1.0",
-    "ahmad-resume-parser": "git@github.com:aginanjar/resume-parser.git#fbac2ee"
+    "resume-parser": "^1.1.0"
   }
 }
