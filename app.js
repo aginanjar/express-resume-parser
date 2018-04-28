@@ -7,15 +7,25 @@ const ResumeParser = require('resume-parser')
 const app = express()
 const PORT = process.env.PORT || 3000
 
+//CORS support settings
+app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    next();
+});
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+
 // Route to /parse/resume
 app.post('/parse/resume', (req, res) => {
+
     const inputDir = process.env.SOURCE_DIR || process.cwd() + '/files/sources/'
     const fileName = req.body.filename
     const outputDir = process.env.OUTPUT_DIR || process.cwd()+'/files/compiled/'
-
+    
+    let removeSourceFile = req.body.remove_source_file || false
     let customMessage = {}
     let processFailed = false
 
@@ -49,6 +59,26 @@ app.post('/parse/resume', (req, res) => {
         .then(file => {
             result = JSON.parse(fs.readFileSync(outputDir + fileName + '.json', 'utf8'))
             
+            // Remove source file
+            console.log('remove source file : '+removeSourceFile)
+            if(removeSourceFile)
+            {
+                const inputFile = inputDir + fileName;
+                if (fs.existsSync(inputFile)) {
+                    fs.unlink(inputFile, (err) => {
+                        if (err) throw err;
+                        console.log(inputFile + ' was deleted')
+                    });
+                } else {
+                    return res
+                        .status(200)
+                        .json({
+                            success: false,
+                            message: "Input is failed to deleted."
+                        })
+                }
+            }
+
             // Remove compiled file
             const outputFile = outputDir + fileName + '.json';
             if (fs.existsSync(outputFile)) {
@@ -61,7 +91,7 @@ app.post('/parse/resume', (req, res) => {
                     .status(200)
                     .json({
                         success: false,
-                        message: "Output is failed to generate."
+                        message: "Output is failed to deleted."
                     })
             }
 
@@ -75,7 +105,7 @@ app.post('/parse/resume', (req, res) => {
         })
         .catch(error => {
             // Return Error response
-            console.error(error);
+            console.log(error);
             return res
                 .status(500)
                 .json({
@@ -85,7 +115,8 @@ app.post('/parse/resume', (req, res) => {
         });
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, (err) => {
+    if(err) console.log("Error happened! "+err)
     console.log('Server started! Listening on port: '+PORT)
 })
 
