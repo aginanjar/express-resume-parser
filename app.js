@@ -6,6 +6,7 @@ const fs = require('fs')
 const ResumeParser = require('resume-parser')
 const app = express()
 const PORT = process.env.PORT || 3000
+const db = require('./helpers/db')
 
 //CORS support settings
 app.use(function (req, res, next) {
@@ -16,7 +17,6 @@ app.use(function (req, res, next) {
 });
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-
 
 // Route to /parse/resume
 app.post('/parse/resume', (req, res) => {
@@ -56,8 +56,13 @@ app.post('/parse/resume', (req, res) => {
     // Resume parsing process
     ResumeParser
         .parseResumeFile(inputDir + fileName, outputDir) //input file, output dir
-        .then(file => {
+        .then(file => 
+        {
             result = JSON.parse(fs.readFileSync(outputDir + fileName + '.json', 'utf8'))
+            db.insert('cms_resume_parse_result', {
+                uploaded_date: new Date().toLocaleString(),
+                result: JSON.stringify(result)
+            })
             
             // Remove source file
             console.log('remove source file : '+removeSourceFile)
